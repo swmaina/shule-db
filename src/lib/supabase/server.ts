@@ -1,4 +1,4 @@
-import { createServerClient } from "@supabase/ssr";
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 export async function createClient() {
@@ -8,14 +8,21 @@ export async function createClient() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() { return cookieStore.getAll(); },
-        setAll(cookiesToSet) {
+        get(name: string) {
+          return cookieStore.get(name)?.value;
+        },
+        set(name: string, value: string, options: CookieOptions) {
           try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
+            cookieStore.set(name, value, options);
           } catch {
-            // Server component — mutations are fine to ignore
+            // Server component - mutations are fine to ignore
+          }
+        },
+        remove(name: string, options: CookieOptions) {
+          try {
+            cookieStore.set(name, "", options);
+          } catch {
+            // Server component - mutations are fine to ignore
           }
         },
       },
@@ -23,7 +30,7 @@ export async function createClient() {
   );
 }
 
-/** Service-role client — only for server-side admin operations */
+/** Service-role client - only for server-side admin operations */
 export function createAdminClient() {
   const { createClient } = require("@supabase/supabase-js");
   return createClient(

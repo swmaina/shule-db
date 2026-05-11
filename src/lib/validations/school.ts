@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { KENYA_COUNTIES } from "@/types";
 
-const countyEnum = z.enum(KENYA_COUNTIES as [string, ...string[]]);
+const countyEnum = z.enum([...KENYA_COUNTIES] as [string, ...string[]]);
 
 export const submitSchoolSchema = z.object({
   name: z.string().min(3, "School name must be at least 3 characters").max(200),
