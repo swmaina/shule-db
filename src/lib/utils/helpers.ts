@@ -2,6 +2,17 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import slugify from "slugify";
 import { formatDistanceToNow } from "date-fns";
+import {
+  CONDITION_LABELS,
+  KENYA_COUNTIES,
+  LEVEL_LABELS,
+  SCHOOL_TYPE_LABELS,
+  type ConditionSupported,
+  type KenyanCounty,
+  type SchoolLevel,
+  type SchoolType,
+  type SearchFilters,
+} from "@/types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -37,22 +48,41 @@ export function buildWhatsAppShareUrl(schoolName: string, url: string): string {
 
 export function parseSearchParams(
   params: Record<string, string | string[] | undefined>
-) {
+): SearchFilters & { page: number } {
+  const levelValues = Object.keys(LEVEL_LABELS) as SchoolLevel[];
+  const conditionValues = Object.keys(CONDITION_LABELS) as ConditionSupported[];
+  const schoolTypeValues = Object.keys(SCHOOL_TYPE_LABELS) as SchoolType[];
+
+  const county =
+    typeof params.county === "string" && KENYA_COUNTIES.includes(params.county as KenyanCounty)
+      ? params.county as KenyanCounty
+      : undefined;
+  const schoolType =
+    typeof params.type === "string" && schoolTypeValues.includes(params.type as SchoolType)
+      ? params.type as SchoolType
+      : undefined;
+  const rawLevels = Array.isArray(params.levels)
+    ? params.levels
+    : typeof params.levels === "string"
+    ? [params.levels]
+    : [];
+  const rawConditions = Array.isArray(params.conditions)
+    ? params.conditions
+    : typeof params.conditions === "string"
+    ? [params.conditions]
+    : [];
+  const page = typeof params.page === "string" ? parseInt(params.page, 10) : 1;
+
   return {
     query: typeof params.q === "string" ? params.q : undefined,
-    county: typeof params.county === "string" ? params.county : undefined,
-    school_type:
-      typeof params.type === "string" ? params.type : undefined,
-    levels: Array.isArray(params.levels)
-      ? params.levels
-      : params.levels
-      ? [params.levels]
-      : undefined,
-    conditions: Array.isArray(params.conditions)
-      ? params.conditions
-      : params.conditions
-      ? [params.conditions]
-      : undefined,
-    page: typeof params.page === "string" ? parseInt(params.page, 10) : 1,
+    county,
+    school_type: schoolType,
+    levels: rawLevels.filter((level): level is SchoolLevel =>
+      levelValues.includes(level as SchoolLevel)
+    ),
+    conditions: rawConditions.filter((condition): condition is ConditionSupported =>
+      conditionValues.includes(condition as ConditionSupported)
+    ),
+    page: Number.isFinite(page) && page > 0 ? page : 1,
   };
 }

@@ -5,7 +5,7 @@ import { useCallback } from "react";
 import {
   KENYA_COUNTIES, SCHOOL_TYPE_LABELS, LEVEL_LABELS, CONDITION_LABELS
 } from "@/types";
-import type { SearchFilters } from "@/types";
+import type { ConditionSupported, SchoolLevel, SchoolType, SearchFilters } from "@/types";
 import { cn } from "@/lib/utils/helpers";
 
 interface Props {
@@ -90,7 +90,7 @@ export default function SearchFiltersPanel({ initialFilters }: Props) {
       {/* School type */}
       <FilterSection title="School type">
         <div className="space-y-1.5">
-          {Object.entries(SCHOOL_TYPE_LABELS).map(([type, label]) => (
+          {(Object.entries(SCHOOL_TYPE_LABELS) as [SchoolType, string][]).map(([type, label]) => (
             <button
               key={type}
               onClick={() =>
@@ -112,7 +112,7 @@ export default function SearchFiltersPanel({ initialFilters }: Props) {
       {/* Levels */}
       <FilterSection title="Level">
         <div className="space-y-1.5">
-          {Object.entries(LEVEL_LABELS).map(([level, label]) => {
+          {(Object.entries(LEVEL_LABELS) as [SchoolLevel, string][]).map(([level, label]) => {
             const active = initialFilters.levels?.includes(level);
             return (
               <button
@@ -135,7 +135,7 @@ export default function SearchFiltersPanel({ initialFilters }: Props) {
       {/* Conditions */}
       <FilterSection title="Conditions supported">
         <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1">
-          {Object.entries(CONDITION_LABELS).map(([cond, label]) => {
+          {(Object.entries(CONDITION_LABELS) as [ConditionSupported, string][]).map(([cond, label]) => {
             const active = initialFilters.conditions?.includes(cond);
             return (
               <button
