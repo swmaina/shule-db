@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://elimufinder.co.ke/sitemap.xml
